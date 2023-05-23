@@ -1,0 +1,66 @@
+# Unity generated folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]nityGenerated/
+
+# Rider generated files
+.idea/
+
+# Visual Studio Code generated files
+.vscode/
+
+# User-specific project settings
+*.sln.DotSettings.user
+*.userprefs
+
+# Build artifacts
+*.apk
+*.unitypackage
+
+# iOS build files
+/[Bb]uild/[Ii]OS/
+/[Tt]emp/[Ii]OS/
+/[Oo]bj/[Ii]OS/
+
+# Android build files
+/[Bb]uild/[Aa]ndroid/
+/[Tt]emp/[Aa]ndroid/
+/[Oo]bj/[Aa]ndroid/
+
+# macOS build files
+/[Bb]uild/[Mm]ac[Oo]S/
+/[Tt]emp/[Mm]ac[Oo]S/
+/[Oo]bj/[Mm]ac[Oo]S/
+
+# Windows build files
+/[Bb]uild/[Ww]indows/
+/[Tt]emp/[Ww]indows/
+/[Oo]bj/[Ww]indows/
+
+# Web build files
+/[Bb]uild/[Ww]eb[Gg]L/
+/[Tt]emp/[Ww]eb[Gg]L/
+/[Oo]bj/[Ww]eb[Gg]L/
+
+# Linux build files
+/[Bb]uild/[Ll]inux/
+/[Tt]emp/[Ll]inux/
+/[Oo]bj/[Ll]inux/
+
+# Temporary auto-generated AssetImportState files
+/[Aa]ssets/[Aa]ssetImportState*.*
+
+# Unity Package Manager
+/[Pp]ackages/
+
+# Unity Collaboration
+/[Aa]ssets/[Cc]ollab*
+
+# Rider project files
+*.csproj
+*.sln
+*.sln.DotSettings
