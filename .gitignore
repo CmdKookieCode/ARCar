@@ -12,6 +12,7 @@
 
 # Visual Studio Code generated files
 .vscode/
+.vs/
 
 # User-specific project settings
 *.sln.DotSettings.user

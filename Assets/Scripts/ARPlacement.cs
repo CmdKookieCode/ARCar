@@ -14,6 +14,7 @@ public class ARPlacement : MonoBehaviour
 
     private bool placementPoseIsValid = false;
 
+    public GameObject tutorial;
 
     void Start()
     {
@@ -22,7 +23,7 @@ public class ARPlacement : MonoBehaviour
 
     void Update()
     {
-        if (spawnedObject == null && placementPoseIsValid && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (spawnedObject == null && placementPoseIsValid && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began && !tutorial.activeSelf)
         {
             ARPlaceObject();
         }

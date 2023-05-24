@@ -21,7 +21,7 @@ public class CarAssemblyManager : MonoBehaviour
     List<ARRaycastHit> m_Hits = new List<ARRaycastHit>();
     private Vector2 touchPos;
 
-    private int currentObjectIndex = 0;
+    public static int currentObjectIndex = -1;
     private GameObject currentAssemblyObject;
     private GameObject currentPlaceholderObject;
 
@@ -38,12 +38,8 @@ public class CarAssemblyManager : MonoBehaviour
         ui.transform.Find("Down").GetComponent<Button>().onClick.AddListener(() => MoveDown());
         ui.transform.Find("RotateL").GetComponent<Button>().onClick.AddListener(() => RotateLeft());
         ui.transform.Find("RotateR").GetComponent<Button>().onClick.AddListener(() => RotateRight());
-        ui.transform.Find("Futher").GetComponent<Button>().onClick.AddListener(() => MoveFurther());
-        ui.transform.Find("Closer").GetComponent<Button>().onClick.AddListener(() => MoveCloser());
-        ui.transform.Find("Right").GetComponent<Button>().onClick.AddListener(() => MoveRight());
-        ui.transform.Find("Left").GetComponent<Button>().onClick.AddListener(() => MoveLeft());
-        ui.transform.Find("Confirm").GetComponent<Button>().onClick.AddListener(() => ConfirmPlacement());
 
+        currentObjectIndex = 0;
     }
     bool TryGetTouchPosition(out Vector2 touchPos)
     {
@@ -131,7 +127,10 @@ public class CarAssemblyManager : MonoBehaviour
         currentAssemblyObject.transform.position = assemblySpot.position;
         currentAssemblyObject.transform.rotation = assemblySpot.rotation;
         currentObjectIndex++;
+
         currentAssemblyObject = null;
+        ui.transform.Find("Tutorial").gameObject.SetActive(true);
+
     }
 
     public void MoveUp()
