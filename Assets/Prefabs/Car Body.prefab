@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3449748598846513151}
   - component: {fileID: 593084661001169717}
   - component: {fileID: -859071199687913259}
+  - component: {fileID: 499999311906128296}
   m_Layer: 0
   m_Name: Car Body
   m_TagString: Untagged
@@ -112,3 +113,20 @@ MonoBehaviour:
   mats:
   - {fileID: 2100000, guid: eec482d485dabd745a2991f023bc190d, type: 2}
   assemblySpot: {fileID: 1760946521067147354}
+--- !u!114 &499999311906128296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385968678135827168}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 444fab106c0780e4cbb470cdd239f51d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 20
+  MaxSpeed: 15
+  Drag: 0.98
+  SteerAngle: 20
+  Traction: 1
