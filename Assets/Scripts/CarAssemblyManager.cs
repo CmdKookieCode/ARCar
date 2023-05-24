@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
@@ -15,6 +16,7 @@ public class CarAssemblyManager : MonoBehaviour
 
     private TextMeshProUGUI debug;
     private Canvas ui;
+    private GameObject controls;
 
     private Camera arCamera;
     private ARRaycastManager m_RaycastManager;
@@ -33,11 +35,14 @@ public class CarAssemblyManager : MonoBehaviour
         m_RaycastManager = GameObject.Find("AR Session Origin").GetComponent<ARRaycastManager>();
         debug = GameObject.FindGameObjectWithTag("Debug").GetComponent<TextMeshProUGUI>();
         ui = GameObject.FindGameObjectWithTag("UI").GetComponent<Canvas>();
+        controls = GameObject.FindGameObjectWithTag("Controls").GetComponent<GameObject>();
 
-        ui.transform.Find("Up").GetComponent<Button>().onClick.AddListener(() => MoveUp());
-        ui.transform.Find("Down").GetComponent<Button>().onClick.AddListener(() => MoveDown());
-        ui.transform.Find("RotateL").GetComponent<Button>().onClick.AddListener(() => RotateLeft());
-        ui.transform.Find("RotateR").GetComponent<Button>().onClick.AddListener(() => RotateRight());
+        DebugDrawer.instance.HandleLog(controls.name + " found", "", LogType.Warning);
+
+        controls.transform.Find("Up").GetComponent<Button>().onClick.AddListener(() => MoveUp());
+        controls.transform.Find("Down").GetComponent<Button>().onClick.AddListener(() => MoveDown());
+        controls.transform.Find("RotateL").GetComponent<Button>().onClick.AddListener(() => RotateLeft());
+        controls.transform.Find("RotateR").GetComponent<Button>().onClick.AddListener(() => RotateRight());
 
         currentObjectIndex = 0;
     }
@@ -61,7 +66,7 @@ public class CarAssemblyManager : MonoBehaviour
         }
         if (m_RaycastManager.Raycast(touchPos, m_Hits, TrackableType.PlaneWithinPolygon))
         {
-            if (m_Hits[0].trackable.gameObject.tag != "UI")
+            if (m_Hits[0].trackable.gameObject.tag != "Controls")
             {
                 var hitPose = m_Hits[0].pose;
 
@@ -90,6 +95,11 @@ public class CarAssemblyManager : MonoBehaviour
     {
         currentAssemblyObject = Instantiate(assemblyObjects[currentObjectIndex], touchPos, Quaternion.identity);
         currentPlaceholderObject = Instantiate(assemblyObjects[currentObjectIndex], transform.position, transform.rotation);
+
+        foreach(Transform transform in currentPlaceholderObject.transform)
+        {
+            transform.GetComponent<Renderer>().sharedMaterials = mats;
+        }
         currentPlaceholderObject.GetComponent<Renderer>().sharedMaterials = mats;
         debug.text = "Assembly object instantiated";
 
