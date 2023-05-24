@@ -6,12 +6,8 @@ public class Tutorial : MonoBehaviour
 {
     public GameObject tutorial;
 
-    private TextMeshProUGUI debug;
-
     void Start()
     {
-        debug = GameObject.FindGameObjectWithTag("Debug").GetComponent<TextMeshProUGUI>();
-
         tutorial.transform.Find("TutorialClose").GetComponent<Button>().onClick.AddListener(() => Close());
     }
 
@@ -58,7 +54,6 @@ public class Tutorial : MonoBehaviour
 
     public void Close()
     {
-        debug.text = "closing tutorial";
         tutorial.SetActive(false);
     }
 }
