@@ -128,3 +128,5 @@ MonoBehaviour:
   assemblySpot: {fileID: 1760946521067147354}
   forwardOffset: 1
   lowerOffset: 0.5
+  mats:
+  - {fileID: 2100000, guid: eec482d485dabd745a2991f023bc190d, type: 2}

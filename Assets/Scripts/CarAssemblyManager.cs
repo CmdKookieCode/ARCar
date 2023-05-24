@@ -1,28 +1,36 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 public class CarAssemblyManager : MonoBehaviour
 {
     public GameObject[] assemblyObjects;
-    public Transform assemblySpot;
 
-    public float forwardOffset = 1f;
-    public float lowerOffset = 0.5f;
+    public Transform assemblySpot;
 
     private TextMeshProUGUI debug;
     private Canvas ui;
 
-    private GameObject arCamera;
+    private Camera arCamera;
+    private ARRaycastManager m_RaycastManager;
+    List<ARRaycastHit> m_Hits = new List<ARRaycastHit>();
+    private Vector2 touchPos;
 
     private int currentObjectIndex = 0;
     private GameObject currentAssemblyObject;
-    private bool isObjectPlaced = false;
+    private GameObject currentPlaceholderObject;
+
+    public Material[] mats;
 
     private void Start()
     {
-        arCamera = GameObject.FindGameObjectWithTag("MainCamera");
+        arCamera = GameObject.Find("AR Camera").GetComponent<Camera>();
+        m_RaycastManager = GameObject.Find("AR Session Origin").GetComponent<ARRaycastManager>();
         debug = GameObject.FindGameObjectWithTag("Debug").GetComponent<TextMeshProUGUI>();
         ui = GameObject.FindGameObjectWithTag("UI").GetComponent<Canvas>();
 
@@ -37,31 +45,58 @@ public class CarAssemblyManager : MonoBehaviour
         ui.transform.Find("Confirm").GetComponent<Button>().onClick.AddListener(() => ConfirmPlacement());
 
     }
-
-    void Update()
+    bool TryGetTouchPosition(out Vector2 touchPos)
     {
         if (Input.touchCount > 0)
         {
-            Touch touch = Input.GetTouch(0);
+            touchPos = Input.GetTouch(0).position;
+            return true;
+        }
+        touchPos = default;
+        return false;
+    }
 
-            if (touch.phase == TouchPhase.Began && !isObjectPlaced)
+    void Update()
+    {
+
+        if (!TryGetTouchPosition(out Vector2 touchPos))
+        {
+            return;
+        }
+        if (m_RaycastManager.Raycast(touchPos, m_Hits, TrackableType.PlaneWithinPolygon))
+        {
+            if (m_Hits[0].trackable.gameObject.tag != "UI")
             {
-                if (currentObjectIndex < assemblyObjects.Length)
+                var hitPose = m_Hits[0].pose;
+
+                if (Input.GetTouch(0).phase == TouchPhase.Began && currentAssemblyObject == null)
                 {
-                    SpawnAssemblyObject();
-                    isObjectPlaced = true;
+                    if (currentObjectIndex < assemblyObjects.Length)
+                    {
+                        //SpawnPlaceholderObject();
+                        SpawnAssemblyObject(hitPose.position);
+                    }
                 }
-            }
+                else if (Input.GetTouch(0).phase == TouchPhase.Moved && currentAssemblyObject != null)
+                {
+                    currentAssemblyObject.transform.position = hitPose.position;
+                }
+
+                if (Input.GetTouch(0).phase == TouchPhase.Ended && currentAssemblyObject != null)
+                {
+                    ConfirmPlacement();
+                }
+            } 
         }
     }
 
-    private void SpawnAssemblyObject()
+    private void SpawnAssemblyObject(Vector3 touchPos)
     {
-        Vector3 spawnPosition = arCamera.transform.position + (arCamera.transform.forward * forwardOffset);
-        spawnPosition.y -= lowerOffset;
+        currentAssemblyObject = Instantiate(assemblyObjects[currentObjectIndex], touchPos, Quaternion.identity);
+        currentPlaceholderObject = Instantiate(assemblyObjects[currentObjectIndex], transform.position, transform.rotation);
+        currentPlaceholderObject.GetComponent<Renderer>().sharedMaterials = mats;
+        debug.text = "Assembly object instantiated";
 
-        currentAssemblyObject = Instantiate(assemblyObjects[currentObjectIndex], spawnPosition, Quaternion.identity);
-        debug.text = "object instantiate";
     }
 
     public void ConfirmPlacement()
@@ -73,12 +108,11 @@ public class CarAssemblyManager : MonoBehaviour
             {
                 debug.text = "correct position";
                 PlaceObjectInAssemblySpot();
+                Destroy(currentPlaceholderObject);
             }
             else
             {
-                debug.text = "remove object";
-                Destroy(currentAssemblyObject);
-                isObjectPlaced = false;
+                debug.text = "Incorrect placement";
             }
         }
     }
@@ -93,11 +127,11 @@ public class CarAssemblyManager : MonoBehaviour
 
     private void PlaceObjectInAssemblySpot()
     {
-        debug.text = "placing object";
+        debug.text = "Object assembled";
         currentAssemblyObject.transform.position = assemblySpot.position;
         currentAssemblyObject.transform.rotation = assemblySpot.rotation;
         currentObjectIndex++;
-        isObjectPlaced = false;
+        currentAssemblyObject = null;
     }
 
     public void MoveUp()
