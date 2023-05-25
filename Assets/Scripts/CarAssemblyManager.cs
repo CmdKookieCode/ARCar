@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
-using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -124,7 +121,7 @@ public class CarAssemblyManager : MonoBehaviour
     {
         if (currentAssemblyObject != null)
         {
-            if (IsObjectInCorrectPosition())
+            if (IsObjectInCorrectPosition() && IsObjectHavingCorrectRotation())
             {
                 PlaceObjectInAssemblySpot();
                 Destroy(currentPlaceholderObject);
@@ -138,6 +135,17 @@ public class CarAssemblyManager : MonoBehaviour
         float distance = Vector3.Distance(currentAssemblyObject.transform.position, assemblySpot.position);
 
         return distance <= distanceThreshold;
+    }
+
+    private bool IsObjectHavingCorrectRotation()
+    {
+        float rotationThreshold = 10f;
+        float yRotation = currentAssemblyObject.transform.eulerAngles.y;
+        float angleDifference = assemblySpot.transform.eulerAngles.y - yRotation;
+
+        //GameObject.FindGameObjectWithTag("Debug").GetComponent<TextMeshProUGUI>().text = "Needed rotation: " + assemblySpot.transform.eulerAngles.y + " Current rotation: " + yRotation + " Difference: " + angleDifference;
+
+        return angleDifference <= rotationThreshold;
     }
 
     private void PlaceObjectInAssemblySpot()
