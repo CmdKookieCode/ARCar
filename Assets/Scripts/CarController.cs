@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
+    /* This script makes the car move when assembly is completed.
+     * Since this script is placed on the car foundation, each assembly part has to be a child of this object.
+     * Otherwise, only the car foundation would move.*/
+
     // Settings
     public float MoveSpeed = 20;
     public float MaxSpeed = 10;
