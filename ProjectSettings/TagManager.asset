@@ -7,6 +7,8 @@ TagManager:
   - UI
   - CarBody
   - Debug
+  - Spawnable
+  - Controls
   layers:
   - Default
   - TransparentFX

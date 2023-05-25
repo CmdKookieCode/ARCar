@@ -1,84 +1,130 @@
-using System.Linq;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 public class CarAssemblyManager : MonoBehaviour
 {
     public GameObject[] assemblyObjects;
+    public Material[] mats;
+
     public Transform assemblySpot;
 
-    public float forwardOffset = 1f;
-    public float lowerOffset = 0.5f;
-
-    private TextMeshProUGUI debug;
     private Canvas ui;
 
-    private GameObject arCamera;
+    private ARRaycastManager m_RaycastManager;
+    List<ARRaycastHit> m_Hits = new List<ARRaycastHit>();
 
-    private int currentObjectIndex = 0;
+    public static int currentObjectIndex = -1;
     private GameObject currentAssemblyObject;
-    private bool isObjectPlaced = false;
+    private GameObject currentPlaceholderObject;
 
     private void Start()
     {
-        arCamera = GameObject.FindGameObjectWithTag("MainCamera");
-        debug = GameObject.FindGameObjectWithTag("Debug").GetComponent<TextMeshProUGUI>();
+        m_RaycastManager = GameObject.Find("AR Session Origin").GetComponent<ARRaycastManager>();
+
         ui = GameObject.FindGameObjectWithTag("UI").GetComponent<Canvas>();
 
-        ui.transform.Find("Up").GetComponent<Button>().onClick.AddListener(() => MoveUp());
-        ui.transform.Find("Down").GetComponent<Button>().onClick.AddListener(() => MoveDown());
-        ui.transform.Find("RotateL").GetComponent<Button>().onClick.AddListener(() => RotateLeft());
-        ui.transform.Find("RotateR").GetComponent<Button>().onClick.AddListener(() => RotateRight());
-        ui.transform.Find("Futher").GetComponent<Button>().onClick.AddListener(() => MoveFurther());
-        ui.transform.Find("Closer").GetComponent<Button>().onClick.AddListener(() => MoveCloser());
-        ui.transform.Find("Right").GetComponent<Button>().onClick.AddListener(() => MoveRight());
-        ui.transform.Find("Left").GetComponent<Button>().onClick.AddListener(() => MoveLeft());
-        ui.transform.Find("Confirm").GetComponent<Button>().onClick.AddListener(() => ConfirmPlacement());
+        SetupButtons();
 
+        currentObjectIndex = 0;
+        ui.transform.Find("Tutorial").gameObject.SetActive(true);
     }
 
-    void Update()
+    private void SetupButtons()
     {
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
+        GameObject controlsPanel = GameObject.FindGameObjectWithTag("Controls");
+        Button[] buttons = controlsPanel.GetComponentsInChildren<Button>();
 
-            if (touch.phase == TouchPhase.Began && !isObjectPlaced)
+        foreach (Button button in buttons)
+        {
+            switch (button.name)
             {
-                if (currentObjectIndex < assemblyObjects.Length)
-                {
-                    SpawnAssemblyObject();
-                    isObjectPlaced = true;
-                }
+                case "Up":
+                    button.onClick.AddListener(MoveUp);
+                    break;
+                case "Down":
+                    button.onClick.AddListener(MoveDown);
+                    break;
+                case "RotateL":
+                    button.onClick.AddListener(RotateLeft);
+                    break;
+                case "RotateR":
+                    button.onClick.AddListener(RotateRight);
+                    break;
             }
         }
     }
 
-    private void SpawnAssemblyObject()
+    void Update()
     {
-        Vector3 spawnPosition = arCamera.transform.position + (arCamera.transform.forward * forwardOffset);
-        spawnPosition.y -= lowerOffset;
 
-        currentAssemblyObject = Instantiate(assemblyObjects[currentObjectIndex], spawnPosition, Quaternion.identity);
-        debug.text = "object instantiate";
+        if (!TryGetTouchPosition(out Vector2 touchPos))
+        {
+            return;
+        }
+        if (m_RaycastManager.Raycast(touchPos, m_Hits, TrackableType.PlaneWithinPolygon))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+            {
+                var hitPose = m_Hits[0].pose;
+
+                if (Input.GetTouch(0).phase == TouchPhase.Began && currentAssemblyObject == null)
+                {
+                    if (currentObjectIndex < assemblyObjects.Length)
+                    {
+                        SpawnAssemblyObject(hitPose.position);
+                    }
+                }
+                else if (Input.GetTouch(0).phase == TouchPhase.Moved && currentAssemblyObject != null)
+                {
+                    Vector3 newPosition = new Vector3(hitPose.position.x, currentAssemblyObject.transform.position.y, hitPose.position.z);
+                    currentAssemblyObject.transform.position = newPosition;
+                }
+
+                if (Input.GetTouch(0).phase == TouchPhase.Ended && currentAssemblyObject != null)
+                {
+                    ConfirmPlacement();
+                }
+            } 
+        }
     }
 
-    public void ConfirmPlacement()
+    bool TryGetTouchPosition(out Vector2 touchPos)
+    {
+        if (Input.touchCount > 0)
+        {
+            touchPos = Input.GetTouch(0).position;
+            return true;
+        }
+        touchPos = default;
+        return false;
+    }
+
+    private void SpawnAssemblyObject(Vector3 touchPos)
+    {
+        currentAssemblyObject = Instantiate(assemblyObjects[currentObjectIndex], touchPos, Quaternion.identity);
+        currentPlaceholderObject = Instantiate(assemblyObjects[currentObjectIndex], transform.position, transform.rotation);
+
+        foreach(Transform transform in currentPlaceholderObject.transform)
+        {
+            transform.GetComponent<Renderer>().sharedMaterials = mats;
+        }
+        currentPlaceholderObject.GetComponent<Renderer>().sharedMaterials = mats;
+
+    }
+
+    private void ConfirmPlacement()
     {
         if (currentAssemblyObject != null)
         {
-            debug.text = "not null";
-            if (IsObjectInCorrectPosition())
+            if (IsObjectInCorrectPosition() && IsObjectHavingCorrectRotation())
             {
-                debug.text = "correct position";
                 PlaceObjectInAssemblySpot();
-            }
-            else
-            {
-                debug.text = "remove object";
-                Destroy(currentAssemblyObject);
-                isObjectPlaced = false;
+                Destroy(currentPlaceholderObject);
             }
         }
     }
@@ -91,83 +137,62 @@ public class CarAssemblyManager : MonoBehaviour
         return distance <= distanceThreshold;
     }
 
-    private void PlaceObjectInAssemblySpot()
+    private bool IsObjectHavingCorrectRotation()
     {
-        debug.text = "placing object";
-        currentAssemblyObject.transform.position = assemblySpot.position;
-        currentAssemblyObject.transform.rotation = assemblySpot.rotation;
-        currentObjectIndex++;
-        isObjectPlaced = false;
+        float rotationThreshold = 10f;
+        float yRotation = currentAssemblyObject.transform.eulerAngles.y;
+        float angleDifference = assemblySpot.transform.eulerAngles.y - yRotation;
+
+        //GameObject.FindGameObjectWithTag("Debug").GetComponent<TextMeshProUGUI>().text = "Needed rotation: " + assemblySpot.transform.eulerAngles.y + " Current rotation: " + yRotation + " Difference: " + angleDifference;
+
+        return angleDifference <= rotationThreshold;
     }
 
-    public void MoveUp()
+    private void PlaceObjectInAssemblySpot()
+    {
+        currentAssemblyObject.transform.position = assemblySpot.position;
+        currentAssemblyObject.transform.rotation = assemblySpot.rotation;
+        currentAssemblyObject.transform.parent = gameObject.transform;
+        currentObjectIndex++;
+        if(currentObjectIndex == assemblyObjects.Length)
+        {
+            gameObject.GetComponent<CarController>().enabled = true; ;
+        }
+        currentAssemblyObject = null;
+        if (currentObjectIndex < assemblyObjects.Length)
+        {
+            ui.transform.Find("Tutorial").gameObject.SetActive(true);
+        }        
+    }
+
+    private void MoveUp()
     {
         if (currentAssemblyObject != null)
         {
-            debug.text = "up";
             currentAssemblyObject.transform.Translate(Vector3.up * 0.025f);
         }
     }
 
-    public void MoveDown()
+    private void MoveDown()
     {
         if (currentAssemblyObject != null)
         {
-            debug.text = "down";
             currentAssemblyObject.transform.Translate(Vector3.down * 0.025f);
         }
     }
 
-    public void MoveLeft()
+    private void RotateLeft()
     {
         if (currentAssemblyObject != null)
         {
-            debug.text = "left";
-            currentAssemblyObject.transform.Translate(Vector3.left * 0.025f);
-        }
-    }
-
-    public void MoveRight()
-    {
-        if (currentAssemblyObject != null)
-        {
-            debug.text = "right";
-            currentAssemblyObject.transform.Translate(Vector3.right * 0.025f);
-        }
-    }
-
-    public void MoveFurther()
-    {
-        if (currentAssemblyObject != null)
-        {
-            debug.text = "further";
-            currentAssemblyObject.transform.Translate(Vector3.forward * 0.025f);
-        }
-    }
-
-    public void MoveCloser()
-    {
-        if (currentAssemblyObject != null)
-        {
-            debug.text = "closer";
-            currentAssemblyObject.transform.Translate(Vector3.back * 0.025f);
-        }
-    }
-
-    public void RotateLeft()
-    {
-        if (currentAssemblyObject != null)
-        {
-            debug.text = "left";
             currentAssemblyObject.transform.Rotate(Vector3.up, -10f);
         }
     }
 
-    public void RotateRight()
+    private void RotateRight()
     {
         if (currentAssemblyObject != null)
         {
-            debug.text = "right";
             currentAssemblyObject.transform.Rotate(Vector3.up, 10f);
         }
     }
