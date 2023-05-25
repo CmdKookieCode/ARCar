@@ -159,8 +159,10 @@ public class CarAssemblyManager : MonoBehaviour
             gameObject.GetComponent<CarController>().enabled = true; ;
         }
         currentAssemblyObject = null;
-        ui.transform.Find("Tutorial").gameObject.SetActive(true);
-        
+        if (currentObjectIndex < assemblyObjects.Length)
+        {
+            ui.transform.Find("Tutorial").gameObject.SetActive(true);
+        }        
     }
 
     private void MoveUp()

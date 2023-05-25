@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: KookieFactory
   productName: ARCar
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -133,7 +133,7 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
-  bundleVersion: 0.1
+  bundleVersion: 1.0.0
   preloadedAssets:
   - {fileID: -5618309429920054306, guid: 09762ac92e4a63f42af739f03494be5d, type: 2}
   - {fileID: 11400000, guid: e0f8c33872e14f2429e40231b04f3e3f, type: 2}
@@ -158,7 +158,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.DefaultCompany.ARCar
+    Android: com.KookieFactory.ARCar
     Standalone: com.DefaultCompany.ARCar
     iPhone: com.DefaultCompany.ARCar
   buildNumber:
