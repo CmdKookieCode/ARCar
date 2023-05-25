@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -67,7 +68,7 @@ public class CarAssemblyManager : MonoBehaviour
         }
         if (m_RaycastManager.Raycast(touchPos, m_Hits, TrackableType.PlaneWithinPolygon))
         {
-            if (m_Hits[0].trackable.gameObject.tag != "Controls")
+            if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
             {
                 var hitPose = m_Hits[0].pose;
 
@@ -151,10 +152,15 @@ public class CarAssemblyManager : MonoBehaviour
     {
         currentAssemblyObject.transform.position = assemblySpot.position;
         currentAssemblyObject.transform.rotation = assemblySpot.rotation;
+        currentAssemblyObject.transform.parent = gameObject.transform;
         currentObjectIndex++;
-
+        if(currentObjectIndex == assemblyObjects.Length)
+        {
+            gameObject.GetComponent<CarController>().enabled = true; ;
+        }
         currentAssemblyObject = null;
         ui.transform.Find("Tutorial").gameObject.SetActive(true);
+        
     }
 
     private void MoveUp()
