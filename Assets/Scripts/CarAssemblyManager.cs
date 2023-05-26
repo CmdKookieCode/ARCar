@@ -10,7 +10,8 @@ public class CarAssemblyManager : MonoBehaviour
 {
     /* This script is responsible for spawning and assembling the different car parts.
      * You will immediately notice there are some errors. This is because we left some code out for you to fill in.
-     * Fill in every "TO DO" with the tips we provided and ask for help if you are stuck.*/ 
+     * Fill in every "TO DO" with the tips we provided and ask for help if you are stuck.
+     * All the errors should be gone by the end and you should be able to run/test the application on your phone. */ 
 
     // List with all the parts we need to assemble
     public GameObject[] assemblyObjects;
@@ -50,13 +51,14 @@ public class CarAssemblyManager : MonoBehaviour
         ui = GameObject.FindGameObjectWithTag("UI").GetComponent<Canvas>();
 
         // We call the function that sets up our UI buttons.
-        SetupButtons();
+
+        /*****TO DO*****/
 
         // Set the current object index so it starts at the first item. 
-        currentObjectIndex = 0;
+        currentObjectIndex = /*****TO DO*****/;
 
         // Lastly we also set the GameObject of our tutorial to active.
-        ui.transform.Find("Tutorial").gameObject.SetActive(true);
+        ui.transform.Find("Tutorial").gameObject./*****TO DO*****/;
     }
 
     /* This function adds an event listener for each control button. 
@@ -77,16 +79,16 @@ public class CarAssemblyManager : MonoBehaviour
             switch (button.name)
             {
                 case "Up":
-                    button.onClick.AddListener(MoveUp);
+                    button.onClick.AddListener(/*****TO DO*****/);
                     break;
                 case "Down":
-                    button.onClick.AddListener(MoveDown);
+                    button.onClick.AddListener(/*****TO DO*****/);
                     break;
                 case "RotateL":
-                    button.onClick.AddListener(RotateLeft);
+                    button.onClick.AddListener(/*****TO DO*****/);
                     break;
                 case "RotateR":
-                    button.onClick.AddListener(RotateRight);
+                    button.onClick.AddListener(/*****TO DO*****/);
                     break;
             }
         }
@@ -106,7 +108,7 @@ public class CarAssemblyManager : MonoBehaviour
             // Check if we are not touching a UI element.
             if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
             {
-                // Put the pose (representation of position and rotation in 3D space) of our intersection point in a variable.
+                // Put the pose (representation of position and rotation in 3D space) of our touched intersection point in a variable.
                 var hitPose = m_Hits[0].pose;
 
                 /* The touch phase refers to the action the finger has taken on the most recent frame update.
@@ -114,26 +116,26 @@ public class CarAssemblyManager : MonoBehaviour
                  * Example: TouchPhase.Began means that a finger touched the screen.  */
 
                 // If a finger touched the screen and we do not have our current assembly object set, we need to spawn it.
-                if (Input.GetTouch(0).phase == TouchPhase.Began && currentAssemblyObject == null)
+                if (Input.GetTouch(0).phase == TouchPhase.Began && /*****TO DO*****/)
                 {
                     // Check if we have not placed every object.
                     if (currentObjectIndex < assemblyObjects.Length)
                     {
                         /* Call the function that spawns our object at the touched location. 
                          * Remember that we made a variable containing information about the position of our touch*/
-                        SpawnAssemblyObject(hitPose.position);
+                        /*****TO DO*****/
                     }
                 }
                 // If a finger moved on the screen and we have a current assembly object, we need to move that object with the finger.
                 else if (Input.GetTouch(0).phase == TouchPhase.Moved && currentAssemblyObject != null)
                 {
                     Vector3 newPosition = new Vector3(hitPose.position.x, currentAssemblyObject.transform.position.y, hitPose.position.z);
-                    currentAssemblyObject.transform.position = newPosition;
+                    currentAssemblyObject.transform.position = /*****TO DO*****/;
                 }
                 // If a finger was lifted from the screen and we have a current assembly object, we need to confirm it's placement.
                 if (Input.GetTouch(0).phase == TouchPhase.Ended && currentAssemblyObject != null)
                 {
-                    ConfirmPlacement();
+                    /*****TO DO*****/;
                 }
             } 
         }
@@ -148,10 +150,10 @@ public class CarAssemblyManager : MonoBehaviour
         if (Input.touchCount > 0)
         {
             touchPos = Input.GetTouch(0).position;
-            return true;
+            return /*****TO DO*****/;
         }
         touchPos = default;
-        return false;
+        return /*****TO DO*****/;
     }
 
     // This is a function for spawning the parts that need to be assembled.
@@ -159,11 +161,11 @@ public class CarAssemblyManager : MonoBehaviour
     {
         /* Instantiate the GameObject in our assemblyObjects list with the index of our currentObjectIndex, at our touch position and with default rotation. 
          * Set this as our current assembly object. */
-        currentAssemblyObject = Instantiate(assemblyObjects[currentObjectIndex], touchPos, Quaternion.identity);
+        currentAssemblyObject = Instantiate(assemblyObjects[currentObjectIndex], /*****TO DO*****/, Quaternion.identity);
 
         /* Instantiate the same object, but using the position and rotation of the car foundation. This works because the parts are in the correct place by origin.
          * Set this as our current placeholder object. */
-        currentPlaceholderObject = Instantiate(assemblyObjects[currentObjectIndex], transform.position, transform.rotation);
+        /*****TO DO*****/ = Instantiate(assemblyObjects[currentObjectIndex], transform.position, transform.rotation);
 
         /* We want to change the material of each placeholder object so it looks semi-transparent.
          * Each part consists of multiple GameObjects so we need to change the material of each child object of the current placeholder object.
@@ -175,21 +177,21 @@ public class CarAssemblyManager : MonoBehaviour
         }
 
         // The mazda logo prefab is just one GameObject, so we need to set the materials of the placeholder object itself too. 
-        currentPlaceholderObject.GetComponent<Renderer>().sharedMaterials = mats;
+        /*****TO DO*****/.GetComponent<Renderer>().sharedMaterials = mats;
     }
 
     // A function that checks whether the current assembly object is on the correct position & rotation
     private void ConfirmPlacement()
     {
         // If the current assembly object is null, we do not need to check it's position and rotation.
-        if (currentAssemblyObject != null)
+        if (/*****TO DO*****/)
         {
             /* Call functions to check position and rotation of our current assembly object.
              * If both cases are true, call function that places the car part. 
              * Destroy the placeholder object so it is no longer in our scene. */
             if (IsObjectInCorrectPosition() && IsObjectHavingCorrectRotation())
             {
-                PlaceObjectInAssemblySpot();
+                /*****TO DO*****/
                 Destroy(currentPlaceholderObject);
             }
         }
@@ -201,7 +203,7 @@ public class CarAssemblyManager : MonoBehaviour
         float distanceThreshold = 0.1f;
         float distance = Vector3.Distance(currentAssemblyObject.transform.position, assemblySpot.position);
 
-        return distance <= distanceThreshold;
+        return /*****TO DO*****/;
     }
 
     // Function that checks whether the difference in rotation between the current assembly object and our assembly spot (the car foundation) is small enough.
@@ -211,15 +213,16 @@ public class CarAssemblyManager : MonoBehaviour
         float yRotation = currentAssemblyObject.transform.eulerAngles.y;
         float angleDifference = assemblySpot.transform.eulerAngles.y - yRotation;
 
-        return angleDifference <= rotationThreshold;
+        return /*****TO DO*****/;
     }
 
     // Function that places the current assembly object at it's correct position.
     private void PlaceObjectInAssemblySpot()
     {
-        // Set the position and rotation of the object to the position and rotation of the assembly spot.
-        currentAssemblyObject.transform.position = assemblySpot.position;
-        currentAssemblyObject.transform.rotation = assemblySpot.rotation;
+        /* Set the position and rotation of the object to the position and rotation of the assembly spot.
+         * Remember that the assemblySpot variable is of type Transform and think about the reason we use .transfrom.position on our current assembly object. */
+        currentAssemblyObject.transform.position = /*****TO DO*****/;
+        currentAssemblyObject.transform.rotation = /*****TO DO*****/;
 
         // Make the current assembly object a child of the car foundation. Go to the CarController script to find out why.
         currentAssemblyObject.transform.parent = gameObject.transform;
@@ -233,7 +236,7 @@ public class CarAssemblyManager : MonoBehaviour
          * Exapmle: if a list has 3 items, the index of the last item would be 2, since indexes start at 0.
          * So if our index equals 2 in this example, we still have not placed our last object in the list.
          * Try to fill in the correct operators based on this information. This site lists the different operators you can use https://helpdesk.castoredc.com/introduction-to-calculations-the-basics/using-the-if-else-logic */
-        if (currentObjectIndex == assemblyObjects.Length)
+        if (currentObjectIndex /*****TO DO*****/ assemblyObjects.Length)
         {
             gameObject.GetComponent<CarController>().enabled = true; ;
         }
@@ -243,7 +246,7 @@ public class CarAssemblyManager : MonoBehaviour
 
         /* Same story as before but in reverse: as long as we have not placed every object, set our tutorial panel active again.
          * Try to fill in the correct operators based on previous information. */
-        if (currentObjectIndex < assemblyObjects.Length)
+        if (currentObjectIndex /*****TO DO*****/ assemblyObjects.Length)
         {
             ui.transform.Find("Tutorial").gameObject.SetActive(true);
         }        

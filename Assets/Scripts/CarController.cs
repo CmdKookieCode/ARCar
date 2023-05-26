@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
-    /* This script makes the car move when assembly is completed.
-     * Since this script is placed on the car foundation, each assembly part has to be a child of this object.
-     * Otherwise, only the car foundation would move.*/
+    /* This script makes the car move when assembly is completed. This can be done by changing the position of the car foundation.
+     * This script is placed on the car foundation GameObject, that way we can easily change the transform.
+     * Since we made each assembly part a child of the foundation object, they will move with their parent object.
+     * Otherwise, only the car foundation would move. 
+     * You can take a look at this script but you do not need to fill in any gaps. */
 
     // Settings
     public float MoveSpeed = 20;
@@ -21,12 +23,11 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Moving
+        // Moving up
         MoveForce += transform.forward * MoveSpeed * 1 * Time.deltaTime;
         transform.position += MoveForce * Time.deltaTime;
 
-        // Steering
-        float steerInput = Input.GetAxis("Horizontal");
+        // Steering to the right
         transform.Rotate(Vector3.up * 1 * MoveForce.magnitude * SteerAngle * Time.deltaTime);
 
         // Drag and max speed limit
