@@ -16,6 +16,7 @@ public class CarAssemblyManager : MonoBehaviour
     // List with all the parts we need to assemble
     public GameObject[] assemblyObjects;
 
+
     // List of materials for semi transparent parts
     public Material[] mats;
 
@@ -38,6 +39,7 @@ public class CarAssemblyManager : MonoBehaviour
     /* These game objects are used to keep track of the part we are currently placing.
      * In this script, the parts a user is placing are called assembly objects.
      * The parts that are there for user guidance are called placeholder objects. */
+     
     private GameObject currentAssemblyObject;
     private GameObject currentPlaceholderObject;
 
@@ -46,6 +48,7 @@ public class CarAssemblyManager : MonoBehaviour
      * We use this function to initialize some of our variables. */
     private void Start()
     {
+
         // We search the RaycastManager and UI in our scene and set them as their variables respectively.
         m_RaycastManager = GameObject.Find("AR Session Origin").GetComponent<ARRaycastManager>();
         ui = GameObject.FindGameObjectWithTag("UI").GetComponent<Canvas>();
